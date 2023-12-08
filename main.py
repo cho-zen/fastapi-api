@@ -1,13 +1,20 @@
-from fastapi import FastAPI
-from os import environ as env
+from fastapi import FastAPI, File, UploadFile
+import uuid
 
 app = FastAPI()
 
 
 @app.get('/')
 async def index():
-    return {"details":"Hello Shivam!!"}
+    return "Hello Shivam!!"
 
+
+@app.post('/upload')
+async def upload_image(file: UploadFile = File(...)):
+    file.filename = f"{uuid.uuid4()}.jpg"
+    contents = await file.read()
+
+    return {"filename": file.filename}
 
 
 # uvicorn main:app --reload --port=8000
