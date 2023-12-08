@@ -6,7 +6,7 @@ app = FastAPI()
 
 @app.get('/')
 async def index():
-    return {"details":"Hello World! This is the env -- {env['MYVARIABLE']}"}
+    return {"details":"Hello Shivam!!"}
 
 
 
