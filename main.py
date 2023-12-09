@@ -1,9 +1,10 @@
 from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import PlainTextResponse
 import uuid
 from fastapi.responses import FileResponse
 import cv2
 import pyrebase
-
+import face_recognition
 
 IMGDIR = "static/"
 app = FastAPI()
@@ -14,16 +15,14 @@ async def index():
     return "Hello Shivam!!"
 
 
-@app.post('/upload')
-async def upload_image(file: UploadFile = File(...)):
+@app.post('/upload/{user_number}/{survey}',response_class=PlainTextResponse)
+async def upload_image(user_number,survey,file: UploadFile = File(...)):
     file.filename = f"image.jpg"
     contents = await file.read()
 
     # Save the file
     with open(f"{IMGDIR}{file.filename}","wb") as f:
         f.write(contents)
-
-    img = cv2.imread(f'{IMGDIR}image.jpg')
     
     firebase_config = {
         "apiKey": "AIzaSyCUagURc1l3froPMMFLnUHgIs9eOODB9XI",
@@ -49,9 +48,21 @@ async def upload_image(file: UploadFile = File(...)):
     # Connect to Database
     db = firebase.database()
 
-    db.child("/ImageData/").set(str(img[:,0,0]),token)
+    # Loading Face Encodings from an Image
+    img = cv2.imread(f'{IMGDIR}image.jpg')
+    find_face = face_recognition.face_locations(img)
 
-    # print(img[:,0,0])
+    if len(find_face) == 0:
+        return PlainTextResponse("0")   
+
+    else:
+        face_enc = face_recognition.face_encodings(img)
+
+        # print(face_enc)
+
+        db.child(f"Data201/{user_number}/{survey}/ImageData").push(str(face_enc[0]),token)
+
+
     return FileResponse(f'{IMGDIR}image.jpg')
 
 
