@@ -4,12 +4,15 @@ from fastapi.responses import FileResponse
 import cv2
 import pyrebase
 
+
 IMGDIR = "static/"
 app = FastAPI()
+
 
 @app.get('/')
 async def index():
     return "Hello Shivam!!"
+
 
 @app.post('/upload')
 async def upload_image(file: UploadFile = File(...)):
@@ -33,17 +36,25 @@ async def upload_image(file: UploadFile = File(...)):
         }
 
     firebase = pyrebase.initialize_app(firebase_config)
+
+    # Get the auth object
+    auth = firebase.auth()
+
+    # Get the current user
+    user = auth.current_user
+
+    # Get the user's token
+    token = user
+
+    # Connect to Database
     db = firebase.database()
 
-    db.child("/ImageData/").set(str(img[:,0,0]))
+    db.child("/ImageData/").set(str(img[:,0,0]),token)
 
     # print(img[:,0,0])
-
-    
-
     return FileResponse(f'{IMGDIR}image.jpg')
 
 
 
-# uvicorn main2:app --reload --port=8000
+# uvicorn main:app --reload --port=8000
 # uvicorn main:app --reload --port=8000 --host=0.0.0.0
