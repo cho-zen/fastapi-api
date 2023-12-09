@@ -1,5 +1,6 @@
 from fastapi import FastAPI, File, UploadFile
 import uuid
+from fastapi.responses import FileResponse
 
 IMGDIR = "static/"
 app = FastAPI()
@@ -19,8 +20,7 @@ async def upload_image(file: UploadFile = File(...)):
     with open(f"{IMGDIR}{file.filename}","wb") as f:
         f.write(contents)
 
-    return "File successfully saved!!"
-
+    return FileResponse(f'{IMGDIR}image.jpg')
 
 
 
