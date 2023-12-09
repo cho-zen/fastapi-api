@@ -1,6 +1,7 @@
 from fastapi import FastAPI, File, UploadFile
 import uuid
 
+IMGDIR = "static/"
 app = FastAPI()
 
 
@@ -11,10 +12,16 @@ async def index():
 
 @app.post('/upload')
 async def upload_image(file: UploadFile = File(...)):
-    file.filename = f"{uuid.uuid4()}.jpg"
+    file.filename = f"image.jpg"
     contents = await file.read()
 
-    return {"filename": file.filename}
+    # Save the file
+    with open(f"{IMGDIR}{file.filename}","wb") as f:
+        f.write(contents)
+
+    return "File successfully saved!!"
+
+
 
 
 # uvicorn main:app --reload --port=8000
