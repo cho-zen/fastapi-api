@@ -9,11 +9,9 @@ import face_recognition
 IMGDIR = "static/"
 app = FastAPI()
 
-
 @app.get('/')
 async def index():
     return "Hello Shivam!!"
-
 
 @app.post('/upload/{user_number}/{survey}',response_class=PlainTextResponse)
 async def upload_image(user_number,survey,file: UploadFile = File(...)):
